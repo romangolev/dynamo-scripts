@@ -7,8 +7,8 @@ __pycache__/
 *.so
 
 # Dynamo backup folders
-
 backup/
+.backup
 
 
 #VS Code settings
