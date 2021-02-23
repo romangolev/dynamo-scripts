@@ -1,199 +1,43 @@
-{
-  "Uuid": "3c9d0464-8643-5ffe-96e5-ab1769818209",
-  "IsCustomNode": false,
-  "Description": "",
-  "Name": "01_Install_RPW_v1.3.4",
-  "ElementResolver": {
-    "ResolutionMap": {}
-  },
-  "Inputs": [
-    {
-      "Id": "497f9fb011e745608ee921ecf3dcba2e",
-      "Name": "String",
-      "Type": "string",
-      "Value": "C:\\temp\\dynamo-python\\rpw.zip",
-      "Description": "Creates a string."
-    }
-  ],
-  "Outputs": [],
-  "Nodes": [
-    {
-      "ConcreteType": "PythonNodeModels.PythonNode, PythonNodeModels",
-      "NodeType": "PythonScriptNode",
-      "Code": "#   Handling import\nimport clr\nimport sys \nsys.path.append(\"C:\\Program Files (x86)\\IronPython 2.7\\Lib\")\nimport os\nimport System\nfrom System import Guid\nfrom System import DateTime\nfrom System.IO import StreamReader\nfrom System.Net import WebRequest, HttpRequestHeader\nclr.AddReference('System.Web.Extensions')\nfrom System.Web.Script.Serialization import JavaScriptSerializer \nfrom System import Type, Activator, IO, Text, Uri, Convert\nimport urllib\n\nfile_path = IN[0]\nfile_link = IN[1]\n\nif not os.path.exists(r'C:\\\\temp'):\n\tos.makedirs(r'C:\\\\temp')\nif not os.path.exists(r'C:\\\\temp\\\\dynamo-python'):\n\tos.makedirs(r'C:\\\\temp\\\\dynamo-python')\n\nurllib.urlretrieve(file_link, file_path)\n\nOUT = \"Successufully copied library\"",
-      "Engine": "IronPython2",
-      "VariableInputPorts": true,
-      "Id": "7c38fa4edab2427b83936973fcacc62c",
-      "Inputs": [
-        {
-          "Id": "f4a62b3f6d194de4bc691a833db1b65f",
-          "Name": "IN[0]",
-          "Description": "Input #0",
-          "UsingDefaultValue": false,
-          "Level": 2,
-          "UseLevels": false,
-          "KeepListStructure": false
-        },
-        {
-          "Id": "54850fb184844383befeae5dd552051d",
-          "Name": "IN[1]",
-          "Description": "Input #1",
-          "UsingDefaultValue": false,
-          "Level": 2,
-          "UseLevels": false,
-          "KeepListStructure": false
-        }
-      ],
-      "Outputs": [
-        {
-          "Id": "25fad72d734146759dc5daac25be8feb",
-          "Name": "OUT",
-          "Description": "Result of the python script",
-          "UsingDefaultValue": false,
-          "Level": 2,
-          "UseLevels": false,
-          "KeepListStructure": false
-        }
-      ],
-      "Replication": "Disabled",
-      "Description": "Runs an embedded Python script."
-    },
-    {
-      "ConcreteType": "CoreNodeModels.Input.StringInput, CoreNodeModels",
-      "NodeType": "StringInputNode",
-      "InputValue": "C:\\temp\\dynamo-python\\rpw.zip",
-      "Id": "497f9fb011e745608ee921ecf3dcba2e",
-      "Inputs": [],
-      "Outputs": [
-        {
-          "Id": "9ec9e9895598405f82c4010ae94d1a93",
-          "Name": "",
-          "Description": "String",
-          "UsingDefaultValue": false,
-          "Level": 2,
-          "UseLevels": false,
-          "KeepListStructure": false
-        }
-      ],
-      "Replication": "Disabled",
-      "Description": "Creates a string."
-    },
-    {
-      "ConcreteType": "Dynamo.Graph.Nodes.CodeBlockNodeModel, DynamoCore",
-      "NodeType": "CodeBlockNode",
-      "Code": "\"C:\\\\temp\\\\dynamo-python\\\\rpw.zip\";\n\"https://raw.githubusercontent.com/romangolev/dynamo-scripts/master/lib/rpw.zip\";",
-      "Id": "bd8def24a9624b728cdafd0cb00944e8",
-      "Inputs": [],
-      "Outputs": [
-        {
-          "Id": "3e4856e8b683416f91646b5b04ea034e",
-          "Name": "",
-          "Description": "Value of expression at line 1",
-          "UsingDefaultValue": false,
-          "Level": 2,
-          "UseLevels": false,
-          "KeepListStructure": false
-        },
-        {
-          "Id": "52641f1786e749f9881801f8fa3d33d4",
-          "Name": "",
-          "Description": "Value of expression at line 2",
-          "UsingDefaultValue": false,
-          "Level": 2,
-          "UseLevels": false,
-          "KeepListStructure": false
-        }
-      ],
-      "Replication": "Disabled",
-      "Description": "Allows for DesignScript code to be authored directly"
-    }
-  ],
-  "Connectors": [
-    {
-      "Start": "3e4856e8b683416f91646b5b04ea034e",
-      "End": "f4a62b3f6d194de4bc691a833db1b65f",
-      "Id": "64f9023529d94b51ac83a8f122944bc1"
-    },
-    {
-      "Start": "52641f1786e749f9881801f8fa3d33d4",
-      "End": "54850fb184844383befeae5dd552051d",
-      "Id": "d26a33e22a10419e96171abe8e15d809"
-    }
-  ],
-  "Dependencies": [],
-  "NodeLibraryDependencies": [],
-  "Bindings": [],
-  "View": {
-    "Dynamo": {
-      "ScaleFactor": 1.0,
-      "HasRunWithoutCrash": true,
-      "IsVisibleInDynamoLibrary": true,
-      "Version": "2.9.0.3137",
-      "RunType": "Manual",
-      "RunPeriod": "1000"
-    },
-    "Camera": {
-      "Name": "Background Preview",
-      "EyeX": -17.0,
-      "EyeY": 24.0,
-      "EyeZ": 50.0,
-      "LookX": 12.0,
-      "LookY": -13.0,
-      "LookZ": -58.0,
-      "UpX": 0.0,
-      "UpY": 1.0,
-      "UpZ": 0.0
-    },
-    "NodeViews": [
-      {
-        "ShowGeometry": true,
-        "Name": "Python Script",
-        "Id": "7c38fa4edab2427b83936973fcacc62c",
-        "IsSetAsInput": false,
-        "IsSetAsOutput": false,
-        "Excluded": false,
-        "X": 199.06703644850677,
-        "Y": 209.75067855455472
-      },
-      {
-        "ShowGeometry": true,
-        "Name": "String",
-        "Id": "497f9fb011e745608ee921ecf3dcba2e",
-        "IsSetAsInput": true,
-        "IsSetAsOutput": false,
-        "Excluded": false,
-        "X": -150.09799143236626,
-        "Y": 101.92854014019919
-      },
-      {
-        "ShowGeometry": true,
-        "Name": "Code Block",
-        "Id": "bd8def24a9624b728cdafd0cb00944e8",
-        "IsSetAsInput": false,
-        "IsSetAsOutput": false,
-        "Excluded": false,
-        "X": -577.02825253844389,
-        "Y": 217.59876650121754
-      }
-    ],
-    "Annotations": [
-      {
-        "Id": "6e23bc7c33104d728ee242ebb97419d1",
-        "Title": "Dynamo script by @romangolev\r\nhttps://github.com/romangolev/dynamo-scripts",
-        "Nodes": [],
-        "Left": -600.88567462790206,
-        "Top": 94.433259953151747,
-        "Width": 0.0,
-        "Height": 0.0,
-        "FontSize": 36.0,
-        "InitialTop": 0.0,
-        "InitialHeight": 0.0,
-        "TextblockHeight": 0.0,
-        "Background": "#FFC1D676"
-      }
-    ],
-    "X": 585.69142327787745,
-    "Y": 111.25062078414612,
-    "Zoom": 0.94443064368256713
-  }
-}
+<Workspace Version="1.3.4.6666" X="73.0746753197443" Y="-43.8197861731318" zoom="0.937432296686001" ScaleFactor="1" Name="Home" Description="" RunType="Manual" RunPeriod="1000" HasRunWithoutCrash="True">
+  <NamespaceResolutionMap />
+  <Elements>
+    <Dynamo.Graph.Nodes.CodeBlockNodeModel guid="25b83bf9-1f73-4c98-84e7-34987334a2e9" type="Dynamo.Graph.Nodes.CodeBlockNodeModel" nickname="Code Block" x="208.049188120536" y="319.606495035708" isVisible="true" isUpstreamVisible="true" lacing="Disabled" isSelectedInput="False" IsFrozen="false" isPinned="false" CodeText="&quot;C:\\temp\\dynamo-python\\rpw.zip&quot;;&#xA;&quot;https://raw.githubusercontent.com/romangolev/dynamo-scripts/master/lib/rpw.zip&quot;;" ShouldFocus="false" />
+    <PythonNodeModels.PythonNode guid="8704f6fa-29da-4cf4-be1a-9337059e5712" type="PythonNodeModels.PythonNode" nickname="Python Script" x="985.401597287516" y="318.950082743468" isVisible="true" isUpstreamVisible="true" lacing="Disabled" isSelectedInput="False" IsFrozen="false" isPinned="false" inputcount="2">
+      <PortInfo index="0" default="False" />
+      <PortInfo index="1" default="False" />
+      <Script>#   Handling import
+import clr
+import sys 
+sys.path.append("C:\Program Files (x86)\IronPython 2.7\Lib")
+import os
+import System
+import subprocess
+
+file_path = IN[0]
+file_link = IN[1]
+
+
+if not os.path.exists(r'C:\\temp'):
+	os.makedirs(r'C:\\temp')
+if not os.path.exists(r'C:\\temp\\dynamo-python'):
+	os.makedirs(r'C:\\temp\\dynamo-python')
+
+subprocess.call("powershell Invoke-WebRequest {} -OutFile {}".format(file_link, file_path), shell=True)
+
+
+OUT = "Successufully copied library"</Script>
+    </PythonNodeModels.PythonNode>
+  </Elements>
+  <Connectors>
+    <Dynamo.Graph.Connectors.ConnectorModel start="25b83bf9-1f73-4c98-84e7-34987334a2e9" start_index="0" end="8704f6fa-29da-4cf4-be1a-9337059e5712" end_index="0" portType="0" />
+    <Dynamo.Graph.Connectors.ConnectorModel start="25b83bf9-1f73-4c98-84e7-34987334a2e9" start_index="1" end="8704f6fa-29da-4cf4-be1a-9337059e5712" end_index="1" portType="0" />
+  </Connectors>
+  <Notes>
+    <Dynamo.Graph.Notes.NoteModel guid="f87bfeda-feba-4e25-b392-744f72e21770" text="Dynamo script by @romangolev&#xD;&#xA;https://github.com/romangolev/dynamo-scripts" x="302.8" y="244.8" />
+  </Notes>
+  <Annotations />
+  <Presets />
+  <Cameras>
+    <Camera Name="Background Preview" eyeX="-17" eyeY="24" eyeZ="50" lookX="12" lookY="-13" lookZ="-58" upX="0" upY="1" upZ="0" />
+  </Cameras>
+</Workspace>
