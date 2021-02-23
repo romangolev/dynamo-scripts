@@ -119,9 +119,12 @@ for room in rooms:
 		new_wall.get_Parameter(BuiltInParameter.WALL_ATTR_ROOM_BOUNDING).Set(1)
 		new_wall.get_Parameter(BuiltInParameter.WALL_KEY_REF_PARAM).Set(3)
 		new_walls.append(new_wall)
-		db.Element(new_wall).parameters['BA_AI_RoomID'].value = room.Id
-		db.Element(new_wall).parameters['BA_AI_RoomName'].value = room.get_Parameter(BuiltInParameter.ROOM_NAME).AsString()
-		db.Element(new_wall).parameters['BA_AI_RoomNumber'].value = room.get_Parameter(BuiltInParameter.ROOM_NUMBER).AsString()
+		try:
+			db.Element(new_wall).parameters['BA_AI_RoomID'].value = room.Id
+			db.Element(new_wall).parameters['BA_AI_RoomName'].value = room.get_Parameter(BuiltInParameter.ROOM_NAME).AsString()
+			db.Element(new_wall).parameters['BA_AI_RoomNumber'].value = room.get_Parameter(BuiltInParameter.ROOM_NUMBER).AsString()
+		except:
+			pass
 	for	wall1 in bound_walls:
 		for wall2 in new_walls:
 			try:

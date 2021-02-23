@@ -1,4 +1,10 @@
-# dynamo-scripts
-Scripts for Dynamo using python, design script and OTTB nodes.
+# Dynamo scripts
 
-Dynamo version can be easily detected by the suffix in the name of Script.
+## Description
+
+Scripts for Dynamo using python, design script and OTTB nodes.
+Version v1.3.4 is mostly used during the development
+
+## Installation and Usage
+
+## Dependencies

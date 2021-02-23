@@ -2,7 +2,7 @@
   "Uuid": "3c9d0464-8643-5ffe-96e5-ab1769818209",
   "IsCustomNode": false,
   "Description": "",
-  "Name": "Wall_Finishing_v1.3.4",
+  "Name": "01_Install_RPW_v1.3.4",
   "ElementResolver": {
     "ResolutionMap": {}
   },
@@ -20,7 +20,7 @@
     {
       "ConcreteType": "PythonNodeModels.PythonNode, PythonNodeModels",
       "NodeType": "PythonScriptNode",
-      "Code": "#   Handling import\nimport clr\nimport sys \nsys.path.append(\"C:\\Program Files (x86)\\IronPython 2.7\\Lib\")\nimport os\nimport System\nfrom System import Guid\nfrom System import DateTime\nfrom System.IO import StreamReader\nfrom System.Net import WebRequest, HttpRequestHeader\nclr.AddReference('System.Web.Extensions')\nfrom System.Web.Script.Serialization import JavaScriptSerializer \nfrom System import Type, Activator, IO, Text, Uri, Convert\n\n\nfile_path = IN[0]\nfile_link = IN[1]\n\ndef LogSaveStrList(string_list):\n\tIO.File.AppendAllLines(file_path, flatten(string_list), Text.Encoding.Unicode)\ndef LogSaveStr(string):\n    if not os.path.exists(r'C:\\\\temp\\\\dynamo-python'):\n        os.makedirs(r'C:\\\\temp\\\\dynamo-python')\n\tIO.File.WriteAllText(file_path, string, Text.Encoding.Unicode)\ndef rsnrequest():\n\trequest = WebRequest.Create(file_link)\n\trequest.Method = \"GET\"\n\trequest.UserAgent = \"Anything\"\n    # Token scenario for closed repositories\n\t#token = ''\n\t#request.Headers[\"OAUTH-TOKEN\"] = token\n\trsp = request.GetResponse()\n\tstream_reader = StreamReader(rsp.GetResponseStream())\n\tjsonData = stream_reader.ReadToEnd()\n\tstream_reader.Close()\n\tjson = JavaScriptSerializer().DeserializeObject(jsonData)\n\treturn json\n\n\njson_recv = rsnrequest()\ndata_from_json = json_recv[\"content\"]\nbase64EncodedBytes = System.Convert.FromBase64String(data_from_json)\npython_code_string = System.Text.Encoding.UTF8.GetString(base64EncodedBytes)\nLogSaveStr(python_code_string)\n\n\nOUT = python_code_string",
+      "Code": "#   Handling import\nimport clr\nimport sys \nsys.path.append(\"C:\\Program Files (x86)\\IronPython 2.7\\Lib\")\nimport os\nimport System\nfrom System import Guid\nfrom System import DateTime\nfrom System.IO import StreamReader\nfrom System.Net import WebRequest, HttpRequestHeader\nclr.AddReference('System.Web.Extensions')\nfrom System.Web.Script.Serialization import JavaScriptSerializer \nfrom System import Type, Activator, IO, Text, Uri, Convert\nimport urllib\n\nfile_path = IN[0]\nfile_link = IN[1]\n\nif not os.path.exists(r'C:\\\\temp'):\n\tos.makedirs(r'C:\\\\temp')\nif not os.path.exists(r'C:\\\\temp\\\\dynamo-python'):\n\tos.makedirs(r'C:\\\\temp\\\\dynamo-python')\n\nurllib.urlretrieve(file_link, file_path)\n\nOUT = \"Successufully copied library\"",
       "Engine": "IronPython2",
       "VariableInputPorts": true,
       "Id": "7c38fa4edab2427b83936973fcacc62c",
@@ -59,46 +59,6 @@
       "Description": "Runs an embedded Python script."
     },
     {
-      "ConcreteType": "PythonNodeModels.PythonStringNode, PythonNodeModels",
-      "Engine": "IronPython2",
-      "VariableInputPorts": true,
-      "NodeType": "ExtensionNode",
-      "Id": "59259e0081b84f47907d2134af414740",
-      "Inputs": [
-        {
-          "Id": "90ce3dc6e9df402d8840fb6a8463e7c6",
-          "Name": "script",
-          "Description": "Python script to run.",
-          "UsingDefaultValue": false,
-          "Level": 2,
-          "UseLevels": false,
-          "KeepListStructure": false
-        },
-        {
-          "Id": "da981bc844b640459df5f0529065008a",
-          "Name": "IN[0]",
-          "Description": "Input #0",
-          "UsingDefaultValue": false,
-          "Level": 2,
-          "UseLevels": false,
-          "KeepListStructure": false
-        }
-      ],
-      "Outputs": [
-        {
-          "Id": "93318a4369f244bd8ce76a74c089a986",
-          "Name": "OUT",
-          "Description": "Result of the python script",
-          "UsingDefaultValue": false,
-          "Level": 2,
-          "UseLevels": false,
-          "KeepListStructure": false
-        }
-      ],
-      "Replication": "Disabled",
-      "Description": "Runs a Python script from a string."
-    },
-    {
       "ConcreteType": "CoreNodeModels.Input.StringInput, CoreNodeModels",
       "NodeType": "StringInputNode",
       "InputValue": "C:\\temp\\dynamo-python\\rpw.zip",
@@ -121,12 +81,12 @@
     {
       "ConcreteType": "Dynamo.Graph.Nodes.CodeBlockNodeModel, DynamoCore",
       "NodeType": "CodeBlockNode",
-      "Code": "\"C:\\\\temp\\\\dynamo-python\\\\Wall_Finishing_v1.3.4.py\";\n\"https://api.github.com/repos/romangolev/dynamo-scripts/contents/python-data/Wall_Finishing_v1.3.4.py?ref=master\";",
+      "Code": "\"C:\\\\temp\\\\dynamo-python\\\\rpw.zip\";\n\"https://raw.githubusercontent.com/romangolev/dynamo-scripts/master/lib/rpw.zip\";",
       "Id": "bd8def24a9624b728cdafd0cb00944e8",
       "Inputs": [],
       "Outputs": [
         {
-          "Id": "b50354e6347b40719eb5a8259f049675",
+          "Id": "3e4856e8b683416f91646b5b04ea034e",
           "Name": "",
           "Description": "Value of expression at line 1",
           "UsingDefaultValue": false,
@@ -135,7 +95,7 @@
           "KeepListStructure": false
         },
         {
-          "Id": "5bb1d16616474597a9336da2cfa2c955",
+          "Id": "52641f1786e749f9881801f8fa3d33d4",
           "Name": "",
           "Description": "Value of expression at line 2",
           "UsingDefaultValue": false,
@@ -150,24 +110,14 @@
   ],
   "Connectors": [
     {
-      "Start": "25fad72d734146759dc5daac25be8feb",
-      "End": "90ce3dc6e9df402d8840fb6a8463e7c6",
-      "Id": "d264eee88089401392cea36bcf960e2a"
-    },
-    {
-      "Start": "9ec9e9895598405f82c4010ae94d1a93",
-      "End": "da981bc844b640459df5f0529065008a",
-      "Id": "4174001aa6fc4591b746a94272c5f18c"
-    },
-    {
-      "Start": "b50354e6347b40719eb5a8259f049675",
+      "Start": "3e4856e8b683416f91646b5b04ea034e",
       "End": "f4a62b3f6d194de4bc691a833db1b65f",
-      "Id": "00699f0016a3411baf658c4f579a381a"
+      "Id": "64f9023529d94b51ac83a8f122944bc1"
     },
     {
-      "Start": "5bb1d16616474597a9336da2cfa2c955",
+      "Start": "52641f1786e749f9881801f8fa3d33d4",
       "End": "54850fb184844383befeae5dd552051d",
-      "Id": "5596e96a2d894c5eac97e6fd0da30be3"
+      "Id": "d26a33e22a10419e96171abe8e15d809"
     }
   ],
   "Dependencies": [],
@@ -203,17 +153,7 @@
         "IsSetAsOutput": false,
         "Excluded": false,
         "X": 199.06703644850677,
-        "Y": 211.44482095739045
-      },
-      {
-        "ShowGeometry": true,
-        "Name": "Python Script From String",
-        "Id": "59259e0081b84f47907d2134af414740",
-        "IsSetAsInput": false,
-        "IsSetAsOutput": false,
-        "Excluded": false,
-        "X": 474.01092117182435,
-        "Y": 75.355464057991725
+        "Y": 209.75067855455472
       },
       {
         "ShowGeometry": true,
@@ -232,8 +172,8 @@
         "IsSetAsInput": false,
         "IsSetAsOutput": false,
         "Excluded": false,
-        "X": -599.899174976725,
-        "Y": 208.28098328562146
+        "X": -577.02825253844389,
+        "Y": 217.59876650121754
       }
     ],
     "Annotations": [
@@ -252,8 +192,8 @@
         "Background": "#FFC1D676"
       }
     ],
-    "X": 701.25055609123149,
-    "Y": 109.83561577735364,
-    "Zoom": 1.01347993068066
+    "X": 585.69142327787745,
+    "Y": 111.25062078414612,
+    "Zoom": 0.94443064368256713
   }
 }
