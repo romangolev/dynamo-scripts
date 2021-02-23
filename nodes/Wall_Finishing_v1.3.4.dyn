@@ -1,0 +1,244 @@
+{
+  "Uuid": "3c9d0464-8643-5ffe-96e5-ab1769818209",
+  "IsCustomNode": false,
+  "Description": "",
+  "Name": "Wall_Finishing_v1.3.4",
+  "ElementResolver": {
+    "ResolutionMap": {}
+  },
+  "Inputs": [
+    {
+      "Id": "497f9fb011e745608ee921ecf3dcba2e",
+      "Name": "String",
+      "Type": "string",
+      "Value": "C:\\temp\\rpw.zip",
+      "Description": "Creates a string."
+    }
+  ],
+  "Outputs": [],
+  "Nodes": [
+    {
+      "ConcreteType": "PythonNodeModels.PythonNode, PythonNodeModels",
+      "NodeType": "PythonScriptNode",
+      "Code": "# Handling import\nimport clr\nimport sys \nsys.path.append(\"C:\\Program Files (x86)\\IronPython 2.7\\Lib\")\nimport os\nimport System\nfrom System import Guid\nfrom System import DateTime\nfrom System.IO import StreamReader\nfrom System.Net import WebRequest, HttpRequestHeader\nclr.AddReference('System.Web.Extensions')\nfrom System.Web.Script.Serialization import JavaScriptSerializer \nfrom System import Type, Activator, IO, Text, Uri, Convert\n\n\nfile_path = IN[0]\nfile_link = IN[1]\n#file_link = 'https://api.github.com/repos/romangolev/dynamo-scripts/contents/wall_finishing/Wall_Finishing_v1.3.4.py?ref=master'\n#file_path = 'C:\\\\temp\\\\dynamo-scripts\\\\Wall_Finishing_v1.3.4.py'\n\n\ndef LogSaveStrList(string_list):\n\tIO.File.AppendAllLines(file_path, flatten(string_list), Text.Encoding.Unicode)\ndef LogSaveStr(string):\n\tIO.File.WriteAllText(file_path, string, Text.Encoding.Unicode)\ndef rsnrequest():\n\trequest = WebRequest.Create(file_link)\n\trequest.Method = \"GET\"\n\trequest.UserAgent = \"Anything\"\n\t#token = ''\n\t#request.Headers[\"OAUTH-TOKEN\"] = token\n\trsp = request.GetResponse()\n\tstream_reader = StreamReader(rsp.GetResponseStream())\n\tjsonData = stream_reader.ReadToEnd()\n\tstream_reader.Close()\n\tjson = JavaScriptSerializer().DeserializeObject(jsonData)\n\treturn json\n\n\njson_recv = rsnrequest()\ndata_from_json = json_recv[\"content\"]\nbase64EncodedBytes = System.Convert.FromBase64String(data_from_json)\npython_code_string = System.Text.Encoding.UTF8.GetString(base64EncodedBytes)\nLogSaveStr(python_code_string)\n\n\nOUT = python_code_string",
+      "Engine": "IronPython2",
+      "VariableInputPorts": true,
+      "Id": "7c38fa4edab2427b83936973fcacc62c",
+      "Inputs": [
+        {
+          "Id": "f4a62b3f6d194de4bc691a833db1b65f",
+          "Name": "IN[0]",
+          "Description": "Input #0",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        },
+        {
+          "Id": "54850fb184844383befeae5dd552051d",
+          "Name": "IN[1]",
+          "Description": "Input #1",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        }
+      ],
+      "Outputs": [
+        {
+          "Id": "25fad72d734146759dc5daac25be8feb",
+          "Name": "OUT",
+          "Description": "Result of the python script",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        }
+      ],
+      "Replication": "Disabled",
+      "Description": "Runs an embedded Python script."
+    },
+    {
+      "ConcreteType": "PythonNodeModels.PythonStringNode, PythonNodeModels",
+      "Engine": "IronPython2",
+      "VariableInputPorts": true,
+      "NodeType": "ExtensionNode",
+      "Id": "59259e0081b84f47907d2134af414740",
+      "Inputs": [
+        {
+          "Id": "90ce3dc6e9df402d8840fb6a8463e7c6",
+          "Name": "script",
+          "Description": "Python script to run.",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        },
+        {
+          "Id": "da981bc844b640459df5f0529065008a",
+          "Name": "IN[0]",
+          "Description": "Input #0",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        }
+      ],
+      "Outputs": [
+        {
+          "Id": "93318a4369f244bd8ce76a74c089a986",
+          "Name": "OUT",
+          "Description": "Result of the python script",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        }
+      ],
+      "Replication": "Disabled",
+      "Description": "Runs a Python script from a string."
+    },
+    {
+      "ConcreteType": "CoreNodeModels.Input.StringInput, CoreNodeModels",
+      "NodeType": "StringInputNode",
+      "InputValue": "C:\\temp\\rpw.zip",
+      "Id": "497f9fb011e745608ee921ecf3dcba2e",
+      "Inputs": [],
+      "Outputs": [
+        {
+          "Id": "9ec9e9895598405f82c4010ae94d1a93",
+          "Name": "",
+          "Description": "String",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        }
+      ],
+      "Replication": "Disabled",
+      "Description": "Creates a string."
+    },
+    {
+      "ConcreteType": "Dynamo.Graph.Nodes.CodeBlockNodeModel, DynamoCore",
+      "NodeType": "CodeBlockNode",
+      "Code": "\"https://api.github.com/repos/romangolev/dynamo-scripts/contents/wall_finishing/Wall_Finishing_v1.3.4.py?ref=master\";\n\"C:\\\\temp\\\\dynamo-scripts\\\\Wall_Finishing_v1.3.4.py\";",
+      "Id": "bd8def24a9624b728cdafd0cb00944e8",
+      "Inputs": [],
+      "Outputs": [
+        {
+          "Id": "dd27e151d67942acadd57f8f8bcb04a2",
+          "Name": "",
+          "Description": "Value of expression at line 1",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        },
+        {
+          "Id": "d484794f8548471282af74cdcc1cf649",
+          "Name": "",
+          "Description": "Value of expression at line 2",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        }
+      ],
+      "Replication": "Disabled",
+      "Description": "Allows for DesignScript code to be authored directly"
+    }
+  ],
+  "Connectors": [
+    {
+      "Start": "25fad72d734146759dc5daac25be8feb",
+      "End": "90ce3dc6e9df402d8840fb6a8463e7c6",
+      "Id": "d264eee88089401392cea36bcf960e2a"
+    },
+    {
+      "Start": "9ec9e9895598405f82c4010ae94d1a93",
+      "End": "da981bc844b640459df5f0529065008a",
+      "Id": "4174001aa6fc4591b746a94272c5f18c"
+    },
+    {
+      "Start": "dd27e151d67942acadd57f8f8bcb04a2",
+      "End": "54850fb184844383befeae5dd552051d",
+      "Id": "0818b8d1704842189a9b22e5a96cde2c"
+    },
+    {
+      "Start": "d484794f8548471282af74cdcc1cf649",
+      "End": "f4a62b3f6d194de4bc691a833db1b65f",
+      "Id": "603d012bec934275907b259d955d8f06"
+    }
+  ],
+  "Dependencies": [],
+  "NodeLibraryDependencies": [],
+  "Bindings": [],
+  "View": {
+    "Dynamo": {
+      "ScaleFactor": 1.0,
+      "HasRunWithoutCrash": true,
+      "IsVisibleInDynamoLibrary": true,
+      "Version": "2.9.0.3137",
+      "RunType": "Manual",
+      "RunPeriod": "1000"
+    },
+    "Camera": {
+      "Name": "Background Preview",
+      "EyeX": -17.0,
+      "EyeY": 24.0,
+      "EyeZ": 50.0,
+      "LookX": 12.0,
+      "LookY": -13.0,
+      "LookZ": -58.0,
+      "UpX": 0.0,
+      "UpY": 1.0,
+      "UpZ": 0.0
+    },
+    "NodeViews": [
+      {
+        "ShowGeometry": true,
+        "Name": "Python Script",
+        "Id": "7c38fa4edab2427b83936973fcacc62c",
+        "IsSetAsInput": false,
+        "IsSetAsOutput": false,
+        "Excluded": false,
+        "X": 283.60659021222955,
+        "Y": 201.11798575045827
+      },
+      {
+        "ShowGeometry": true,
+        "Name": "Python Script From String",
+        "Id": "59259e0081b84f47907d2134af414740",
+        "IsSetAsInput": false,
+        "IsSetAsOutput": false,
+        "Excluded": false,
+        "X": 475.9874369902,
+        "Y": 139.906153018889
+      },
+      {
+        "ShowGeometry": true,
+        "Name": "String",
+        "Id": "497f9fb011e745608ee921ecf3dcba2e",
+        "IsSetAsInput": true,
+        "IsSetAsOutput": false,
+        "Excluded": false,
+        "X": 113.499270626341,
+        "Y": -71.3412800416845
+      },
+      {
+        "ShowGeometry": true,
+        "Name": "Code Block",
+        "Id": "bd8def24a9624b728cdafd0cb00944e8",
+        "IsSetAsInput": false,
+        "IsSetAsOutput": false,
+        "Excluded": false,
+        "X": -538.28063960985378,
+        "Y": 195.13894317987314
+      }
+    ],
+    "Annotations": [],
+    "X": -8.2636994650208635,
+    "Y": -34.294236326325006,
+    "Zoom": 1.4027873027716284
+  }
+}
