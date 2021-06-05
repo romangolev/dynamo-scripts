@@ -1,0 +1,139 @@
+<Workspace Version="1.0.1.1503" X="1531.55765843589" Y="-1512.6176764151" zoom="0.767236257719963" Name="Home" Description="" RunType="Manual" RunPeriod="1000" HasRunWithoutCrash="True">
+  <NamespaceResolutionMap />
+  <Elements>
+    <PythonNodeModels.PythonNode guid="d28b794a-98f4-4a81-835a-f7cae61a8eab" type="PythonNodeModels.PythonNode" nickname="Python Script by Andreas Dieckmann" x="-500.953138267498" y="2144.33952891078" isVisible="true" isUpstreamVisible="true" lacing="Disabled" isSelectedInput="False" IsFrozen="false" isPinned="false" inputcount="1">
+      <Script>import clr
+import sys
+sys.path.append('C:\\Program Files (x86)\\IronPython 2.7\\Lib')
+import glob
+import os
+#
+# Save, reset and run the script
+reset = IN[0]
+#
+# Path to the storage location of the Dynamo file version
+log_path = os.path.expanduser(
+	"~\\AppData\\Roaming\\Dynamo\\DynamoCore\\1.0\\Logs")
+file_path = None
+error = 'No Record Found.'
+# OUT = glob.glob(log_path)
+# In% s - the path log_path is substituted, and inside the function iglob is triggered
+# sort all files insede the log_path folder
+file_pattern = '%s\\*.txt' % log_path
+all_log_files = glob.iglob(file_pattern)  # All files in the lo_path folder
+
+# File with the latest date
+latest_file = max((all_log_files), key=os.path.getctime)
+
+list_of_lines = []
+with open(latest_file, 'rb') as f: # Open the last log file with the rb flag
+	for line in reversed(list(f)): # Read from the end of line this file
+	
+		if 'Saving' in line: # find the path to the folder in the line User\AppData
+			if os.path.expanduser("~\\AppData") in line:
+				pass
+			else: # Define the storage folder for the current dyn file
+				file_path = line.rsplit(" ",2)[1].strip()
+				break
+OUT = file_path if life_path != None else error</Script>
+    </PythonNodeModels.PythonNode>
+    <CoreNodeModels.Input.BoolSelector guid="efb62a7d-8a5e-4c30-b9e3-b4fabd420714" type="CoreNodeModels.Input.BoolSelector" nickname="Boolean" x="-683.834639666563" y="2147.10351322269" isVisible="true" isUpstreamVisible="true" lacing="Disabled" isSelectedInput="True" IsFrozen="false" isPinned="false">
+      <System.Boolean>False</System.Boolean>
+    </CoreNodeModels.Input.BoolSelector>
+    <PythonNodeModels.PythonNode guid="3e1f0f75-f8ef-4936-9527-65f2bdccefef" type="PythonNodeModels.PythonNode" nickname="Python Script by Dimitar Venkov" x="-1410.17233872412" y="2115.08687550775" isVisible="true" isUpstreamVisible="true" lacing="Disabled" isSelectedInput="False" IsFrozen="false" isPinned="false" inputcount="2">
+      <Script>import clr
+import sys
+sys.path.append('C:\\Program Files (x86)\\IronPython 2.7\\Lib')
+import glob, os
+
+log_path = IN[0]
+file_path = None
+error = 'No Record Found.'
+
+latest = max(glob.iglob('%s\\*.txt'%log_path), key=os.path.getctime)
+with open(latest, 'rb') as f:
+	for line in reversed(list(f) ):
+		if 'Saving' in line:
+				file_path = line.rsplit(" ",2)[1].strip()
+				break
+				
+OUT = (file_path, os.path.split(file_path)[1])\
+if file_path != None else error</Script>
+    </PythonNodeModels.PythonNode>
+    <CoreNodeModels.Input.Directory guid="e43e4c6f-5637-486a-9112-1542c6654225" type="CoreNodeModels.Input.Directory" nickname="Directory Path" x="-1673.54018407394" y="2116.19033493926" isVisible="true" isUpstreamVisible="true" lacing="Disabled" isSelectedInput="True" IsFrozen="false" isPinned="false">
+      <System.String>C:\Users\buenh\AppData\Roaming\Dynamo\Dynamo Revit\1.0\Logs</System.String>
+      <HintPath>C:\Users\buenh\AppData\Roaming\Dynamo\Dynamo Revit\1.0\Logs</HintPath>
+    </CoreNodeModels.Input.Directory>
+    <CoreNodeModels.Input.BoolSelector guid="86f28248-a93f-4301-859b-1b8ff0422a68" type="CoreNodeModels.Input.BoolSelector" nickname="Boolean" x="-1631.54170155796" y="2218.49259692558" isVisible="true" isUpstreamVisible="true" lacing="Disabled" isSelectedInput="True" IsFrozen="false" isPinned="false">
+      <System.Boolean>False</System.Boolean>
+    </CoreNodeModels.Input.BoolSelector>
+    <Dynamo.Graph.Nodes.CodeBlockNodeModel guid="61f4698d-34b6-4122-8530-d89ab22caf86" type="Dynamo.Graph.Nodes.CodeBlockNodeModel" nickname="Code Block" x="-1957.09945056318" y="2115.758259267" isVisible="true" isUpstreamVisible="true" lacing="Disabled" isSelectedInput="False" IsFrozen="false" isPinned="false" CodeText="//dir to Dynamo's log files&#xA;&#xA;//the file is only backed up&#xA;//some time after opening it&#xA;//it would have been great if&#xA;//each graph open event is&#xA;//logged in instead" ShouldFocus="false" />
+    <CoreNodeModels.Watch guid="84fb8c19-f7ad-4300-adbe-490ba8576cb3" type="CoreNodeModels.Watch" nickname="Watch" x="-1153.98358651235" y="2116.49254902194" isVisible="true" isUpstreamVisible="true" lacing="Disabled" isSelectedInput="False" IsFrozen="false" isPinned="false" />
+    <Dynamo.Graph.Nodes.CodeBlockNodeModel guid="e3c006cd-5e12-4933-a9dc-74465cad9868" type="Dynamo.Graph.Nodes.CodeBlockNodeModel" nickname="Code Block" x="-1413.47382421139" y="2264.57835948329" isVisible="true" isUpstreamVisible="true" lacing="Disabled" isSelectedInput="False" IsFrozen="false" isPinned="false" CodeText="//the node fetches the latest log file&#xA;//and extracts the latest save path&#xA;&#xA;//if you save your graph after&#xA;//execution, a save trigger will&#xA;//be iniciated that will be logged" ShouldFocus="false" />
+    <CoreNodeModels.Watch guid="a6269b14-07d1-433b-a4b0-c1ac1aa9fb6b" type="CoreNodeModels.Watch" nickname="Watch" x="-208.727614909697" y="2143.24974692144" isVisible="true" isUpstreamVisible="true" lacing="Disabled" isSelectedInput="False" IsFrozen="false" isPinned="false" />
+    <CoreNodeModels.Input.Directory guid="cfbc9b0e-3cc7-4c17-be81-ef86fa3a3d94" type="CoreNodeModels.Input.Directory" nickname="Directory Path" x="-1553.70497606787" y="2655.19157640349" isVisible="true" isUpstreamVisible="true" lacing="Disabled" isSelectedInput="True" IsFrozen="false" isPinned="false">
+      <System.String>C:\Users\buenh\AppData\Roaming\Dynamo\Dynamo Revit\1.0\Logs</System.String>
+      <HintPath>C:\Users\buenh\AppData\Roaming\Dynamo\Dynamo Revit\1.0\Logs</HintPath>
+    </CoreNodeModels.Input.Directory>
+    <CoreNodeModels.Input.BoolSelector guid="ae94fb5b-41d9-4804-b15f-8ebb8459322a" type="CoreNodeModels.Input.BoolSelector" nickname="Boolean" x="-1511.70649355188" y="2757.49383838981" isVisible="true" isUpstreamVisible="true" lacing="Disabled" isSelectedInput="True" IsFrozen="false" isPinned="false">
+      <System.Boolean>False</System.Boolean>
+    </CoreNodeModels.Input.BoolSelector>
+    <PythonNodeModels.PythonNode guid="62bbdfa7-8464-44b1-9ab9-0aa7801bbfe5" type="PythonNodeModels.PythonNode" nickname="Python Script by Dimitar Venkov modified by Haley Bueno" x="-1325.92084252124" y="2654.08811697198" isVisible="true" isUpstreamVisible="true" lacing="Disabled" isSelectedInput="False" IsFrozen="false" isPinned="false" inputcount="2">
+      <Script>import clr
+import sys
+sys.path.append('C:\\Program Files (x86)\\IronPython 2.7\\Lib')
+import glob, os
+
+log_path = IN[0]
+file_path = None
+error = 'No Record Found.'
+
+latest = max(glob.iglob('%s\\*.txt'%log_path), key=os.path.getctime)
+with open(latest, 'rb') as f:
+	for line in reversed(list(f) ):
+	
+		if 'Saving' in line:
+			if os.path.expanduser("~\\AppData") in line:
+				pass
+			else:
+				file_path = line.rsplit(" ",2)[1].strip()
+				break
+				
+OUT = (file_path, os.path.split(file_path)[1])\
+if file_path != None else error</Script>
+    </PythonNodeModels.PythonNode>
+    <Dynamo.Graph.Nodes.CodeBlockNodeModel guid="07ef70bd-a1b1-4987-8162-ca8c10894fb7" type="Dynamo.Graph.Nodes.CodeBlockNodeModel" nickname="Code Block" x="-1837.26424255711" y="2654.75950073123" isVisible="true" isUpstreamVisible="true" lacing="Disabled" isSelectedInput="False" IsFrozen="false" isPinned="false" CodeText="//dir to Dynamo's log files&#xA;&#xA;//the file is only backed up&#xA;//some time after opening it&#xA;//it would have been great if&#xA;//each graph open event is&#xA;//logged in instead" ShouldFocus="false" />
+    <CoreNodeModels.Watch guid="22fe195c-e738-41a9-a634-13b185b7cd8e" type="CoreNodeModels.Watch" nickname="Watch" x="-924.849755870614" y="2654.22287626946" isVisible="true" isUpstreamVisible="true" lacing="Disabled" isSelectedInput="False" IsFrozen="false" isPinned="false" />
+    <Dynamo.Graph.Nodes.CodeBlockNodeModel guid="f9882d04-7920-494f-b968-74f4a83a64d5" type="Dynamo.Graph.Nodes.CodeBlockNodeModel" nickname="Code Block" x="-1293.63861620532" y="2803.57960094751" isVisible="true" isUpstreamVisible="true" lacing="Disabled" isSelectedInput="False" IsFrozen="false" isPinned="false" CodeText="//the node fetches the latest log file&#xA;//and extracts the latest save path&#xA;&#xA;//if you save your graph after&#xA;//execution, a save trigger will&#xA;//be iniciated that will be logged" ShouldFocus="false" />
+  </Elements>
+  <Connectors>
+    <Dynamo.Graph.Connectors.ConnectorModel start="d28b794a-98f4-4a81-835a-f7cae61a8eab" start_index="0" end="a6269b14-07d1-433b-a4b0-c1ac1aa9fb6b" end_index="0" portType="0" />
+    <Dynamo.Graph.Connectors.ConnectorModel start="efb62a7d-8a5e-4c30-b9e3-b4fabd420714" start_index="0" end="d28b794a-98f4-4a81-835a-f7cae61a8eab" end_index="0" portType="0" />
+    <Dynamo.Graph.Connectors.ConnectorModel start="3e1f0f75-f8ef-4936-9527-65f2bdccefef" start_index="0" end="84fb8c19-f7ad-4300-adbe-490ba8576cb3" end_index="0" portType="0" />
+    <Dynamo.Graph.Connectors.ConnectorModel start="e43e4c6f-5637-486a-9112-1542c6654225" start_index="0" end="3e1f0f75-f8ef-4936-9527-65f2bdccefef" end_index="0" portType="0" />
+    <Dynamo.Graph.Connectors.ConnectorModel start="86f28248-a93f-4301-859b-1b8ff0422a68" start_index="0" end="3e1f0f75-f8ef-4936-9527-65f2bdccefef" end_index="1" portType="0" />
+    <Dynamo.Graph.Connectors.ConnectorModel start="cfbc9b0e-3cc7-4c17-be81-ef86fa3a3d94" start_index="0" end="62bbdfa7-8464-44b1-9ab9-0aa7801bbfe5" end_index="0" portType="0" />
+    <Dynamo.Graph.Connectors.ConnectorModel start="ae94fb5b-41d9-4804-b15f-8ebb8459322a" start_index="0" end="62bbdfa7-8464-44b1-9ab9-0aa7801bbfe5" end_index="1" portType="0" />
+    <Dynamo.Graph.Connectors.ConnectorModel start="62bbdfa7-8464-44b1-9ab9-0aa7801bbfe5" start_index="0" end="22fe195c-e738-41a9-a634-13b185b7cd8e" end_index="0" portType="0" />
+  </Connectors>
+  <Notes />
+  <Annotations>
+    <Dynamo.Graph.Annotations.AnnotationModel guid="1f8a8748-6e3c-443d-8c9b-5f38e5a182bf" annotationText="Dimitar Venkov Script to Read The Last Log File Of The Current Script" left="-1967.09945056318" top="2076.08687550775" width="1099.11586405083" height="360.491483975534" fontSize="24" InitialTop="2115.08687550775" InitialHeight="352.762398192228" TextblockHeight="29" backgrouund="#FFC1D676">
+      <Models ModelGuid="3e1f0f75-f8ef-4936-9527-65f2bdccefef" />
+      <Models ModelGuid="e43e4c6f-5637-486a-9112-1542c6654225" />
+      <Models ModelGuid="86f28248-a93f-4301-859b-1b8ff0422a68" />
+      <Models ModelGuid="61f4698d-34b6-4122-8530-d89ab22caf86" />
+      <Models ModelGuid="84fb8c19-f7ad-4300-adbe-490ba8576cb3" />
+      <Models ModelGuid="e3c006cd-5e12-4933-a9dc-74465cad9868" />
+    </Dynamo.Graph.Annotations.AnnotationModel>
+    <Dynamo.Graph.Annotations.AnnotationModel guid="e4ccb151-d65a-47e8-bafc-0052975972e8" annotationText="Andreas Dieckmann - Python Script To Obtain Current Dynamo File Path" left="-693.834639666563" top="2075.24974692144" width="587.107024756866" height="162.089781989338" fontSize="24" InitialTop="2143.24974692144" InitialHeight="124.089781989338" TextblockHeight="58" backgrouund="#FFFFC999">
+      <Models ModelGuid="d28b794a-98f4-4a81-835a-f7cae61a8eab" />
+      <Models ModelGuid="efb62a7d-8a5e-4c30-b9e3-b4fabd420714" />
+      <Models ModelGuid="a6269b14-07d1-433b-a4b0-c1ac1aa9fb6b" />
+    </Dynamo.Graph.Annotations.AnnotationModel>
+  </Annotations>
+  <Presets />
+  <Cameras>
+    <Camera Name="Background Preview" eyeX="-7651.35124607683" eyeY="-12312.2324040006" eyeZ="45829.0496077463" lookX="6001.55235661597" lookY="-6501.68220048842" lookZ="-29007.5036689313" upX="0" upY="1" upZ="0" />
+  </Cameras>
+</Workspace>

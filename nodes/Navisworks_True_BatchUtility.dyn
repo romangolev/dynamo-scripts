@@ -1,0 +1,252 @@
+<Workspace Version="1.3.4.6666" X="2312.09467920929" Y="1236.97330378274" zoom="0.696337777189502" ScaleFactor="1" Name="Home" Description="" RunType="Manual" RunPeriod="1000" HasRunWithoutCrash="False">
+  <NamespaceResolutionMap />
+  <Elements>
+    <Prorubim.DS.Common.ForceChildrensEval guid="16175f0d-1bdf-4abf-bd90-fcd009a6438a" type="Prorubim.DS.Common.ForceChildrensEval" nickname="ForceChildrensEval" x="-3756.05592009486" y="-533.73878080101" isVisible="true" isUpstreamVisible="true" lacing="Disabled" isSelectedInput="False" IsFrozen="false" isPinned="false">
+      <PortInfo index="0" default="False" />
+    </Prorubim.DS.Common.ForceChildrensEval>
+    <CoreNodeModels.Input.BoolSelector guid="8f25a30b-2d86-4094-a238-f8f49a82a4e1" type="CoreNodeModels.Input.BoolSelector" nickname="Выполнить" x="-3159.94638675816" y="-1630.28327602997" isVisible="true" isUpstreamVisible="true" lacing="Disabled" isSelectedInput="True" IsFrozen="false" isPinned="false">
+      <System.Boolean>True</System.Boolean>
+    </CoreNodeModels.Input.BoolSelector>
+    <PythonNodeModels.PythonNode guid="4a08f9a5-c02e-4227-ac80-65574c824d9a" type="PythonNodeModels.PythonNode" nickname="Парсер ревитсервера" x="-3130.34940006375" y="-885.421278865979" isVisible="true" isUpstreamVisible="true" lacing="Disabled" isSelectedInput="False" IsFrozen="true" isPinned="true" inputcount="3">
+      <PortInfo index="0" default="False" />
+      <PortInfo index="1" default="False" />
+      <PortInfo index="2" default="False" />
+      <Script># -*- coding: utf-8 -*- 
+#-----------------------Импоорт библиотек----------------------
+import clr
+import sys 
+sys.path.append("C:\Program Files (x86)\IronPython 2.7\Lib")
+import os
+
+import System
+from System import Guid
+from System import DateTime
+from System.IO import StreamReader
+from System.Net import WebRequest
+clr.AddReference('System.Web.Extensions')
+from System.Web.Script.Serialization import JavaScriptSerializer 
+
+clr.AddReference('RevitAPI')
+import Autodesk
+from Autodesk.Revit.DB import ModelPathUtils
+
+
+clr.AddReference("RevitServices")
+import RevitServices
+from RevitServices.Persistence import DocumentManager
+
+#-----------------------ФУНКЦИИ----------------------
+
+def rsnrequest(p_f_n):
+	request = WebRequest.Create("http://"+revit_server_name+"/RevitServerAdminRESTService"+version+"/AdminRESTService.svc/|"+p_f_n+"|/contents")		
+	request.Method = "GET"
+	request.Headers.Add("User-Name", os.environ.get('USERNAME'))
+	request.Headers.Add("User-Machine-Name", os.getenv('COMPUTERNAME', 'defaultValue'))
+	request.Headers.Add("Operation-GUID", Guid.NewGuid().ToString())
+
+	rsp = request.GetResponse()
+	stream_reader = StreamReader(rsp.GetResponseStream())
+
+	jsonData = stream_reader.ReadToEnd()
+
+	json = JavaScriptSerializer().DeserializeObject(jsonData)
+	return (json)
+
+def folderpars(folderslist):
+	for fldr in folderslist:
+		path = "rsn://"+revit_server_name+"/"+project_folder_name+"/"+fldr+"/"
+		json = rsnrequest(project_folder_name+"|"+fldr)	
+		model_data_list = json["Models"]
+		models_list = [m["Name"] for m in model_data_list]
+		for model in models_list:
+			#mpatch = ModelPathUtils.ConvertUserVisiblePathToModelPath(path+model)
+			paths.append(path+model)
+	return paths	
+
+#-----------------------АПИ ПАРАМЕТРЫ----------------------
+
+app = DocumentManager.Instance.CurrentUIApplication.Application
+version = app.VersionNumber
+
+#-----------------------РАБОЧИЕ ПАРАМЕТРЫ----------------------
+
+revit_server_name = IN[0] #Server name: "sh35revit1.hals.local"
+folder_path = IN[1] #Project folder name: "Павлова 38"
+
+paths = []
+
+out = None
+
+#-----------------------НАЧАЛО СКРИПТА----------------------
+if "/" in folder_path:
+	corect_folder = folder_path.replace("/", "|")	
+else:
+	corect_folder = folder_path
+
+
+#path = "rsn://"+revit_server_name+"/"+project_folder_name
+if "|" in corect_folder:
+	project_folder_name = corect_folder.split("|")[0]
+	out = folderpars([corect_folder.split("|")[1]])
+else:
+	json = rsnrequest(corect_folder)
+	folder_data_list = json["Folders"]
+	find_folders_list = [m["Name"] for m in folder_data_list]
+	out = folderpars(find_folders_list)
+
+OUT = out</Script>
+    </PythonNodeModels.PythonNode>
+    <Prorubim.DS.Common.ForceChildrensEval guid="9c98cbec-5e2c-45c8-a8fa-db063a34c3a6" type="Prorubim.DS.Common.ForceChildrensEval" nickname="ForceChildrensEval" x="-3466.50399045866" y="-1476.60082844816" isVisible="true" isUpstreamVisible="true" lacing="Disabled" isSelectedInput="False" IsFrozen="false" isPinned="false">
+      <PortInfo index="0" default="False" />
+    </Prorubim.DS.Common.ForceChildrensEval>
+    <Dynamo.Graph.Nodes.CodeBlockNodeModel guid="0212f65a-d029-4536-adc2-c86d0ba08ae3" type="Dynamo.Graph.Nodes.CodeBlockNodeModel" nickname="Адрес ревит сервера" x="-3769.86099605749" y="-872.089939962616" isVisible="true" isUpstreamVisible="true" lacing="Disabled" isSelectedInput="False" IsFrozen="false" isPinned="true" CodeText="&quot;revit1.bim&quot;;" ShouldFocus="false" />
+    <Dynamo.Graph.Nodes.CodeBlockNodeModel guid="9d19d6f9-5a42-466c-baf5-ebbf20d38a10" type="Dynamo.Graph.Nodes.CodeBlockNodeModel" nickname="Папка на сервере:" x="-3762.85783051655" y="-738.14661486729" isVisible="true" isUpstreamVisible="true" lacing="Disabled" isSelectedInput="False" IsFrozen="false" isPinned="false" CodeText="&quot;Папка проекта/АР&quot;;" ShouldFocus="false" />
+    <Dynamo.Graph.Nodes.CodeBlockNodeModel guid="2441fb72-9e25-490b-9232-04505f6f9954" type="Dynamo.Graph.Nodes.CodeBlockNodeModel" nickname="Code Block" x="-3758.22606238177" y="-646.112513813529" isVisible="true" isUpstreamVisible="true" lacing="Disabled" isSelectedInput="False" IsFrozen="false" isPinned="false" CodeText="&quot;Папка проекта&quot;;" ShouldFocus="false" />
+    <Dynamo.Graph.Nodes.CodeBlockNodeModel guid="b18ed487-c78e-471e-bcd6-94427c458504" type="Dynamo.Graph.Nodes.CodeBlockNodeModel" nickname="Если надо выбрать один файл из папки, запустить, найти имя в &quot;Парсер ревитсервера&quot; указать полученый индекс:" x="-3763.85885953832" y="-420.176028983155" isVisible="true" isUpstreamVisible="true" lacing="Disabled" isSelectedInput="False" IsFrozen="false" isPinned="true" CodeText="{x[5]};" ShouldFocus="false">
+      <PortInfo index="0" default="False" />
+    </Dynamo.Graph.Nodes.CodeBlockNodeModel>
+    <PythonNodeModels.PythonNode guid="68def9ca-af7c-4623-9ab5-e2da2b316262" type="PythonNodeModels.PythonNode" nickname="Парсер локальной папки" x="-3167.57472840598" y="-1474.74047787539" isVisible="true" isUpstreamVisible="true" lacing="Disabled" isSelectedInput="False" IsFrozen="false" isPinned="true" inputcount="1">
+      <PortInfo index="0" default="False" />
+      <Script>import sys
+sys.path.append('C:\Program Files (x86)\IronPython 2.7\Lib')
+import os
+import glob
+
+dir = IN[0]
+
+names = os.listdir(dir)
+names2 = glob.glob(dir+"\\*.rvt")
+
+OUT = names2</Script>
+    </PythonNodeModels.PythonNode>
+    <CoreNodeModels.Input.Directory guid="a36332a3-d54e-4c20-9cc8-6ebc9d2603f4" type="CoreNodeModels.Input.Directory" nickname="Directory Path" x="-3612.13069561259" y="-1474.69584219969" isVisible="true" isUpstreamVisible="true" lacing="Disabled" isSelectedInput="True" IsFrozen="false" isPinned="false">
+      <System.String>C:\test</System.String>
+      <HintPath>C:\test</HintPath>
+    </CoreNodeModels.Input.Directory>
+    <CoreNodeModels.Input.Directory guid="0cbec4ad-8465-44e0-a320-0bc313880b7a" type="CoreNodeModels.Input.Directory" nickname="Directory Path to nwc Export" x="-3168.09614807673" y="-1113.54266793153" isVisible="true" isUpstreamVisible="true" lacing="Disabled" isSelectedInput="True" IsFrozen="false" isPinned="false">
+      <System.String>C:\test</System.String>
+      <HintPath>C:\test</HintPath>
+    </CoreNodeModels.Input.Directory>
+    <PythonNodeModels.PythonNode guid="157aed28-513d-4f33-86df-7eaf1c4c4683" type="PythonNodeModels.PythonNode" nickname="Создание nwc" x="-2650.7142813109" y="-1632.6782874927" isVisible="true" isUpstreamVisible="true" lacing="Disabled" isSelectedInput="False" IsFrozen="false" isPinned="true" inputcount="3">
+      <PortInfo index="0" default="False" />
+      <PortInfo index="1" default="False" />
+      <PortInfo index="2" default="False" />
+      <Script># -*- coding: utf-8 -*-
+if IN[0]:
+	import clr
+	clr.AddReference('RevitServices')
+	import RevitServices
+	from RevitServices.Persistence import DocumentManager
+	#from RevitServices.Transactions import TransactionManager
+
+	clr.AddReference('RevitAPI')
+	import Autodesk.Revit.DB
+	from Autodesk.Revit.DB import NavisworksExportScope, View3D, FilteredElementCollector, Document, ModelPathUtils, OpenOptions, NavisworksExportOptions, NavisworksCoordinates, DetachFromCentralOption
+
+	import System
+	from System import TimeSpan
+
+	class TimeCounter:
+		def __init__(self):
+			self.time = System.Diagnostics.Stopwatch.StartNew()
+			self.time.Start()
+		def stop(self):
+			self.time.Stop()
+			return self.time.Elapsed
+
+	uiapp = DocumentManager.Instance.CurrentUIApplication
+	app = uiapp.Application
+	doc = DocumentManager.Instance.CurrentDBDocument
+
+	file_list = IN[1]
+	foldere_to_export = IN[2]
+	opt = OpenOptions()
+	opt.DetachFromCentralOption = DetachFromCentralOption.DetachAndPreserveWorksets
+	opt.AllowOpeningLocalByWrongUser = True
+	#views3d = [v for v in FilteredElementCollector(doc).OfClass(View3D) if not v.IsTemplate]
+	#view_3d_navisworks = [view for view in views3d if "navisworks" in view.Name]
+
+	def re_file(file_str): # type: str
+		mpath = ModelPathUtils.ConvertUserVisiblePathToModelPath(file_str)
+		doc = app.OpenDocumentFile(mpath,opt)
+		nw_ex_opt = NavisworksExportOptions()
+		
+		views3d = [v for v in FilteredElementCollector(doc).OfClass(View3D) if not v.IsTemplate]
+		view_3d_navisworks = [view for view in views3d if "navisworks" in view.Name.lower()]
+		if view_3d_navisworks:
+			nw_ex_opt.ExportScope = NavisworksExportScope.View
+			nw_ex_opt.ViewId = view_3d_navisworks[0].Id
+		nw_ex_opt.ExportRoomGeometry = False
+		nw_ex_opt.Coordinates = NavisworksCoordinates.Shared
+		nw_ex_opt.ExportLinks = False
+		nw_ex_opt.ExportParts = True
+		doc.Export(foldere_to_export, doc.Title, nw_ex_opt)
+		doc.Close(False)
+		#return view_3d_navisworks
+
+	test = []
+	all_time_dic = {}
+
+	for file_str in file_list:
+		time = TimeCounter()
+		test.append(re_file(file_str)) # важна только эта строчка
+		t = time.stop()
+		all_time_dic[file_str] = t
+
+	all_time_by_file = []
+	all_time_by_file.append("File time")
+	for file, time in all_time_dic.items():
+		if 'full_time_count' not in locals():
+			full_time_count = time
+			all_time_by_file.append((file, (time.Minutes, time.Seconds, time.Milliseconds)))
+		else:
+			full_time_count += time
+			all_time_by_file.append((file, (time.Minutes, time.Seconds, time.Milliseconds)))
+
+	full_time = (("Minutes", "Seconds", "Milliseconds"), "Full time:", (full_time_count.Minutes, full_time_count.Seconds, full_time_count.Milliseconds))
+
+	OUT = full_time, all_time_by_file
+else:
+	OUT = 'not run'</Script>
+    </PythonNodeModels.PythonNode>
+  </Elements>
+  <Connectors>
+    <Dynamo.Graph.Connectors.ConnectorModel start="16175f0d-1bdf-4abf-bd90-fcd009a6438a" start_index="0" end="4a08f9a5-c02e-4227-ac80-65574c824d9a" end_index="2" portType="0" />
+    <Dynamo.Graph.Connectors.ConnectorModel start="8f25a30b-2d86-4094-a238-f8f49a82a4e1" start_index="0" end="157aed28-513d-4f33-86df-7eaf1c4c4683" end_index="0" portType="0" />
+    <Dynamo.Graph.Connectors.ConnectorModel start="9c98cbec-5e2c-45c8-a8fa-db063a34c3a6" start_index="0" end="68def9ca-af7c-4623-9ab5-e2da2b316262" end_index="0" portType="0" />
+    <Dynamo.Graph.Connectors.ConnectorModel start="0212f65a-d029-4536-adc2-c86d0ba08ae3" start_index="0" end="4a08f9a5-c02e-4227-ac80-65574c824d9a" end_index="0" portType="0" />
+    <Dynamo.Graph.Connectors.ConnectorModel start="9d19d6f9-5a42-466c-baf5-ebbf20d38a10" start_index="0" end="4a08f9a5-c02e-4227-ac80-65574c824d9a" end_index="1" portType="0" />
+    <Dynamo.Graph.Connectors.ConnectorModel start="68def9ca-af7c-4623-9ab5-e2da2b316262" start_index="0" end="157aed28-513d-4f33-86df-7eaf1c4c4683" end_index="1" portType="0" />
+    <Dynamo.Graph.Connectors.ConnectorModel start="a36332a3-d54e-4c20-9cc8-6ebc9d2603f4" start_index="0" end="9c98cbec-5e2c-45c8-a8fa-db063a34c3a6" end_index="0" portType="0" />
+    <Dynamo.Graph.Connectors.ConnectorModel start="0cbec4ad-8465-44e0-a320-0bc313880b7a" start_index="0" end="157aed28-513d-4f33-86df-7eaf1c4c4683" end_index="2" portType="0" />
+  </Connectors>
+  <Notes />
+  <Annotations>
+    <Dynamo.Graph.Annotations.AnnotationModel guid="3a98ee88-6623-44ce-a677-e7212b5fd5ea" annotationText="Парсер ревитсервера" left="-3779.86099605749" top="-931.901278865979" width="812.15159599374" height="604.485249882824" fontSize="30" InitialTop="-885.421278865979" InitialHeight="461.351159161607" TextblockHeight="36.48" backgrouund="#FFFF7BAC">
+      <Models ModelGuid="16175f0d-1bdf-4abf-bd90-fcd009a6438a" />
+      <Models ModelGuid="4a08f9a5-c02e-4227-ac80-65574c824d9a" />
+      <Models ModelGuid="0212f65a-d029-4536-adc2-c86d0ba08ae3" />
+      <Models ModelGuid="9d19d6f9-5a42-466c-baf5-ebbf20d38a10" />
+      <Models ModelGuid="2441fb72-9e25-490b-9232-04505f6f9954" />
+      <Models ModelGuid="b18ed487-c78e-471e-bcd6-94427c458504" />
+    </Dynamo.Graph.Annotations.AnnotationModel>
+    <Dynamo.Graph.Annotations.AnnotationModel guid="13824e3f-273e-4704-929c-f16d6b4f0cd7" annotationText="Парсер локальной папки" left="-3622.13069561259" top="-1523.08082844816" width="640.23596720661" height="142.10498624847" fontSize="30" InitialTop="-1476.60082844816" InitialHeight="143.72212497255" TextblockHeight="36.48" backgrouund="#FFFF7BAC">
+      <Models ModelGuid="68def9ca-af7c-4623-9ab5-e2da2b316262" />
+      <Models ModelGuid="a36332a3-d54e-4c20-9cc8-6ebc9d2603f4" />
+      <Models ModelGuid="9c98cbec-5e2c-45c8-a8fa-db063a34c3a6" />
+    </Dynamo.Graph.Annotations.AnnotationModel>
+    <Dynamo.Graph.Annotations.AnnotationModel guid="8847d2b1-e57c-4115-ba4a-ca7449873900" annotationText="" left="-3178.09614807673" top="-1160.02266793153" width="210.08" height="140.2" fontSize="30" InitialTop="-1113.54266793153" InitialHeight="123.72" TextblockHeight="36.48" backgrouund="#FFFF7BAC">
+      <Models ModelGuid="0cbec4ad-8465-44e0-a320-0bc313880b7a" />
+    </Dynamo.Graph.Annotations.AnnotationModel>
+    <Dynamo.Graph.Annotations.AnnotationModel guid="0fb711d2-4e3e-48ed-9aa2-a013db80eaaa" annotationText="" left="-2660.7142813109" top="-1679.1582874927" width="143.84" height="191.08" fontSize="30" InitialTop="-1632.6782874927" InitialHeight="174.6" TextblockHeight="36.48" backgrouund="#FF48B9FF">
+      <Models ModelGuid="157aed28-513d-4f33-86df-7eaf1c4c4683" />
+    </Dynamo.Graph.Annotations.AnnotationModel>
+    <Dynamo.Graph.Annotations.AnnotationModel guid="b0649882-b6d0-40cc-b296-30da2716a8ae" annotationText="" left="-3169.94638675816" top="-1676.76327602997" width="155.36" height="114.28" fontSize="30" InitialTop="-1630.28327602997" InitialHeight="97.8" TextblockHeight="36.48" backgrouund="#FFFF7BAC">
+      <Models ModelGuid="8f25a30b-2d86-4094-a238-f8f49a82a4e1" />
+    </Dynamo.Graph.Annotations.AnnotationModel>
+  </Annotations>
+  <Presets />
+  <Cameras>
+    <Camera Name="Фоновый просмотр" eyeX="-17" eyeY="24" eyeZ="50" lookX="12" lookY="-13" lookZ="-58" upX="0" upY="1" upZ="0" />
+  </Cameras>
+</Workspace>

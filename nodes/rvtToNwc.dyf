@@ -1,0 +1,122 @@
+<Workspace Version="1.3.4.6666" X="0" Y="0" zoom="1" ScaleFactor="1" Name="rvtToNwc" Description="Export Revit models into Navisworks" ID="97d9db9f-7921-42c9-bd8d-1e3ef9192ea3" Category="Revit">
+  <NamespaceResolutionMap>
+    <ClassMap partialName="String" resolvedName="DSCore.String" assemblyName="DSCoreNodes.dll" />
+    <ClassMap partialName="List" resolvedName="DSCore.List" assemblyName="DSCoreNodes.dll" />
+  </NamespaceResolutionMap>
+  <Elements>
+    <PythonNodeModels.PythonNode guid="1c1a2523-23cb-4381-8e4c-94ef8816b437" type="PythonNodeModels.PythonNode" nickname="exportNWD" x="250" y="0" isVisible="true" isUpstreamVisible="true" lacing="Disabled" isSelectedInput="False" IsFrozen="false" isPinned="true" inputcount="3">
+      <PortInfo index="0" default="False" />
+      <PortInfo index="1" default="False" />
+      <PortInfo index="2" default="False" />
+      <Script>import clr;
+
+clr.AddReference("System");
+from System.Collections.Generic import List;
+from System.Collections import ArrayList;
+from System import String;
+from System import Environment;
+from System.IO import FileInfo;
+
+clr.AddReference("RevitAPI");
+from Autodesk.Revit.DB import *;
+
+clr.AddReference("RevitServices");
+from RevitServices.Persistence import DocumentManager as DocMgr;
+from RevitServices.Transactions import TransactionManager as TrMgr;
+
+clr.AddReference("ProtoGeometry");
+from Autodesk.DesignScript.Geometry import *
+
+def checkInput(filePath):
+	err = 0;
+	if not ModelPathUtils.IsValidUserVisibleFullServerPath(filePath):
+		err = 1;
+	if err:
+		err = 0;
+		fi = FileInfo(filePath);
+		if not fi.Exists or fi.Name.Split('.')[1].ToLower() != "rvt":
+			err = 2;
+	return (err);
+	
+def findNwdView(doc, viewname):
+	col = FilteredElementCollector(doc);
+	nameRule = ParameterFilterRuleFactory.CreateContainsRule(ElementId(BuiltInParameter.VIEW_NAME), viewname, False);
+	nameFltr = ElementParameterFilter(nameRule);
+	viewFltr = ElementClassFilter(clr.GetClrType(View));
+	nwdView = col.WherePasses(viewFltr).WherePasses(nameFltr).WhereElementIsNotElementType().FirstElement();
+	return (nwdView);
+	
+def setupExpOptions(nwdView):
+	expOpts = NavisworksExportOptions();
+	if nwdView != None:
+		expOpts.ExportScope = NavisworksExportScope.View;
+		expOpts.ViewId = nwdView.Id;
+	return (expOpts);
+
+
+def exportNWD(filePath, expPath, viewName):
+	err = checkInput(filePath);
+	if err:
+		return ("Invalid path");
+	app = DocMgr.Instance.CurrentUIApplication.Application;
+	modelPath = ModelPathUtils.ConvertUserVisiblePathToModelPath(filePath);
+	openOpts = OpenOptions();
+	wsConfig = WorksetConfiguration(WorksetConfigurationOption.OpenAllWorksets);
+	openOpts.SetOpenWorksetsConfiguration(wsConfig);
+	doc = app.OpenDocumentFile(modelPath, openOpts);
+	expView = findNwdView(doc, viewName);
+	expOpts = setupExpOptions(expView);
+	if expPath == None:
+		expPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+	doc.Export(expPath, String.Empty, expOpts);
+	doc.Close(False);
+	return (filePath);
+	
+def export(filePaths, expPath, viewName):
+	res = [];
+	for fp in filePaths:
+		res.append(exportNWD(fp, expPath, viewName));
+	return (res);
+
+
+# deal with the input
+if isinstance(IN[0], list):
+	paths = IN[0];
+else:
+	paths = [IN[0]];
+
+if len(paths) and paths[0]:
+	res = export(paths, IN[1], IN[2]);
+	
+else:
+	res = "No Input";
+
+OUT = res;</Script>
+    </PythonNodeModels.PythonNode>
+    <Dynamo.Graph.Nodes.CustomNodes.Symbol guid="731fa074-5d4e-4256-8b71-f0264f5a9eef" type="Dynamo.Graph.Nodes.CustomNodes.Symbol" nickname="Input" x="0" y="0" isVisible="true" isUpstreamVisible="true" lacing="Disabled" isSelectedInput="True" IsFrozen="false" isPinned="false">
+      <Symbol value="ModelPaths:string[]" />
+    </Dynamo.Graph.Nodes.CustomNodes.Symbol>
+    <Dynamo.Graph.Nodes.CustomNodes.Symbol guid="23cbec29-5d2a-432b-b849-99ebb69dc96b" type="Dynamo.Graph.Nodes.CustomNodes.Symbol" nickname="Input" x="136" y="285" isVisible="true" isUpstreamVisible="true" lacing="Disabled" isSelectedInput="True" IsFrozen="false" isPinned="false">
+      <Symbol value="OutputDirectory:string" />
+    </Dynamo.Graph.Nodes.CustomNodes.Symbol>
+    <Dynamo.Graph.Nodes.CustomNodes.Output guid="f2c5c2b8-858f-40f0-98b1-f814c73c8a83" type="Dynamo.Graph.Nodes.CustomNodes.Output" nickname="Output" x="449" y="0" isVisible="true" isUpstreamVisible="true" lacing="Disabled" isSelectedInput="False" IsFrozen="false" isPinned="false">
+      <PortInfo index="0" default="False" />
+      <Symbol value="Status:List" />
+    </Dynamo.Graph.Nodes.CustomNodes.Output>
+    <Dynamo.Graph.Nodes.CustomNodes.Symbol guid="e693e1ef-f251-4131-8406-317eaacac2d0" type="Dynamo.Graph.Nodes.CustomNodes.Symbol" nickname="Input" x="162" y="174" isVisible="true" isUpstreamVisible="true" lacing="Disabled" isSelectedInput="True" IsFrozen="false" isPinned="false">
+      <Symbol value="ViewName:string" />
+    </Dynamo.Graph.Nodes.CustomNodes.Symbol>
+  </Elements>
+  <Connectors>
+    <Dynamo.Graph.Connectors.ConnectorModel start="1c1a2523-23cb-4381-8e4c-94ef8816b437" start_index="0" end="f2c5c2b8-858f-40f0-98b1-f814c73c8a83" end_index="0" portType="0" />
+    <Dynamo.Graph.Connectors.ConnectorModel start="731fa074-5d4e-4256-8b71-f0264f5a9eef" start_index="0" end="1c1a2523-23cb-4381-8e4c-94ef8816b437" end_index="0" portType="0" />
+    <Dynamo.Graph.Connectors.ConnectorModel start="23cbec29-5d2a-432b-b849-99ebb69dc96b" start_index="0" end="1c1a2523-23cb-4381-8e4c-94ef8816b437" end_index="1" portType="0" />
+    <Dynamo.Graph.Connectors.ConnectorModel start="e693e1ef-f251-4131-8406-317eaacac2d0" start_index="0" end="1c1a2523-23cb-4381-8e4c-94ef8816b437" end_index="2" portType="0" />
+  </Connectors>
+  <Notes />
+  <Annotations />
+  <Presets />
+  <Cameras>
+    <Camera Name="Background Preview" eyeX="-17" eyeY="24" eyeZ="50" lookX="12" lookY="-13" lookZ="-58" upX="0" upY="1" upZ="0" />
+  </Cameras>
+</Workspace>

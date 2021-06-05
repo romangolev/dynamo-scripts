@@ -1,0 +1,103 @@
+<Workspace Version="1.3.4.6666" X="317.380870291036" Y="-177.280392994987" zoom="0.639201542248483" ScaleFactor="1" Name="Home" Description="" RunType="Manual" RunPeriod="1000" HasRunWithoutCrash="True">
+  <NamespaceResolutionMap />
+  <Elements>
+    <PythonNodeModels.PythonNode guid="b1379440-d63f-49ce-ba12-349308bdb69b" type="PythonNodeModels.PythonNode" nickname="Python Script" x="49.1567708650926" y="551.721234691843" isVisible="true" isUpstreamVisible="true" lacing="Disabled" isSelectedInput="False" IsFrozen="false" isPinned="false" inputcount="1">
+      <PortInfo index="0" default="False" />
+      <Script>import sys
+sys.path.append(IN[0])
+
+import rpw
+
+
+import sys
+import os
+from collections import namedtuple
+
+
+from Autodesk.Revit.DB.Architecture import Room
+from Autodesk.Revit.DB import *
+
+
+import rpw
+from rpw import doc, uidoc, DB, UI, db, ui
+
+selection = ui.Selection()
+
+selected_rooms = [e for e in selection.elements if isinstance(e, Room)]
+if not selected_rooms:
+    UI.TaskDialog.Show('MakeFloors', 'You need to select at lest one Room.')
+    sys.exit()
+
+#Get floor_types
+floor_types = rpw.db.Collector(of_category='OST_Floors', is_type=True).get_elements(wrapped=False)
+#Select floor type
+floor_type_options = {DB.Element.Name.GetValue(t): t for t in floor_types}
+#Select floor type
+floor_type = ui.forms.SelectFromList('Make Floors', floor_type_options,
+                                     description='Select Floor Type')
+
+
+#Get the ID of floor
+floor_type_id = floor_type.Id
+f = []
+
+@rpw.db.Transaction.ensure('Make Floor')
+def make_floor(new_floor):
+    floor_curves = DB.CurveArray()
+    for boundary_segment in new_floor.boundary:
+        try:
+            floor_curves.Append(boundary_segment.Curve)       # 2015, dep 2016
+        except AttributeError:
+            floor_curves.Append(boundary_segment.GetCurve())  # 2017
+
+    floorType = doc.GetElement(new_floor.floor_type_id)
+    level = doc.GetElement(new_floor.level_id)
+    normal_plane = DB.XYZ.BasisZ
+    f = doc.Create.NewFloor(floor_curves, floorType, level, False, normal_plane)
+    db.Element(f).parameters['BA_AI_RoomName'].value = room_name[c]
+    db.Element(f).parameters['BA_AI_RoomNumber'].value = room_number[c]
+    db.Element(f).parameters['BA_AI_RoomID'].value = room_id[c]
+
+NewFloor = namedtuple('NewFloor', ['floor_type_id', 'boundary', 'level_id'])
+new_floors = []
+room_name  = []
+room_number = []
+room_id = []
+room_boundary_options = DB.SpatialElementBoundaryOptions()
+
+for room in selected_rooms:
+    room_level_id = room.Level.Id
+    # List of Boundary Segment comes in an array by itself.
+    room_boundary = room.GetBoundarySegments(room_boundary_options)[0]
+    new_floor = NewFloor(floor_type_id=floor_type_id, boundary=room_boundary,
+                         level_id=room_level_id)
+    new_floors.append(new_floor)
+    room_name.append(room.get_Parameter(BuiltInParameter.ROOM_NAME).AsString())
+    room_number.append(room.get_Parameter(BuiltInParameter.ROOM_NUMBER).AsString())
+    room_id.append(room.get_Parameter(BuiltInParameter.ID_PARAM).AsString())
+
+
+c = 0
+#Create floor
+for new_floor in new_floors:
+    make_floor(new_floor)
+    c += 1
+
+#col = rpw.db.Collector(of_category='OST_Levels', is_not_type=True)
+#OUT = col.new_flors</Script>
+    </PythonNodeModels.PythonNode>
+    <CoreNodeModels.Input.StringInput guid="35c5dca7-0816-4f15-9aaa-7096601f343b" type="CoreNodeModels.Input.StringInput" nickname="String" x="-283.657190890409" y="550.953238561868" isVisible="true" isUpstreamVisible="true" lacing="Disabled" isSelectedInput="True" IsFrozen="false" isPinned="false">
+      <System.String>\\10.10.50.30\shared$\Standards\01.BA STANDARDS\08.BIM STANDARDS\02.RESOURCES\Autodesk_Dynamo\Dynamo_Packages1.3.4\RevitPythonWrapper\extra\rpw.zip</System.String>
+      <System.String value="\\10.10.50.30\shared$\Standards\01.BA STANDARDS\08.BIM STANDARDS\02.RESOURCES\Autodesk_Dynamo\Dynamo_Packages1.3.4\RevitPythonWrapper\extra\rpw.zip" />
+    </CoreNodeModels.Input.StringInput>
+  </Elements>
+  <Connectors>
+    <Dynamo.Graph.Connectors.ConnectorModel start="35c5dca7-0816-4f15-9aaa-7096601f343b" start_index="0" end="b1379440-d63f-49ce-ba12-349308bdb69b" end_index="0" portType="0" />
+  </Connectors>
+  <Notes />
+  <Annotations />
+  <Presets />
+  <Cameras>
+    <Camera Name="Background Preview" eyeX="-17" eyeY="24" eyeZ="50" lookX="12" lookY="-13" lookZ="-58" upX="0" upY="1" upZ="0" />
+  </Cameras>
+</Workspace>
